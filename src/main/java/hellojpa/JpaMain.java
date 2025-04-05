@@ -4,7 +4,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
-import jpabook.jpashop.domain.Order;
 
 import java.util.List;
 
@@ -20,20 +19,27 @@ public class JpaMain {
 
         try {
 
-            Member member = new Member();
-            member.setUsername("member1");
-            em.persist(member);
-
-
             // 저장
             Team team = new Team();
             team.setName("TeamA");
-            team.getMembers().add(member);
             em.persist(team);
 
-
+            Member member = new Member();
+            member.setUsername("member1");
+            member.changeTeam(team);
+            em.persist(member);
+            
             em.flush(); // 영속성 컨텍스트를 데이터베이스와 동기화
             em.clear(); // 영속성 컨텍스트를 비워서 DB에서 새로 로드하도록 함
+            
+            Team findTeam = em.find(Team.class, team.getId());
+            List<Member> members = findTeam.getMembers();
+
+            System.out.println(findTeam);
+
+            for (Member m : members) {
+                System.out.println("m.getUsername() = " + m.getUsername());
+            }
 
             tx.commit();
         } catch (Exception e) {
